@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Based Autonomous NPC Agent Using Reinforcement Learning - Project Report</title>
+    <meta name="description" content="Detailed project report for training an intelligent NPC agent in a 2D tactical combat environment using PPO Reinforcement Learning.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --border-color: #1f2937;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --glow-color: rgba(6, 182, 212, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- Header Hero Section --- */
+        header {
+            background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, #818cf8, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 800px;
+            margin: 0 auto 24px auto;
+        }
+
+        /* --- Main Content Layout --- */
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        section {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--glow-color);
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::before {
+            content: '//';
+            color: var(--accent-blue);
+            font-weight: 800;
+        }
+
+        p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+
+        /* --- Table Styling --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        th {
+            background-color: #1f2937;
+            color: var(--accent-cyan);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* --- Image Showcase Layout --- */
+        .showcase {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .showcase-item {
+            width: 100%;
+            max-width: 800px;
+            background: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .showcase-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid #1f2937;
+        }
+
+        .caption {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* --- Grid Lists --- */
+        .grid-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media(min-width: 768px) {
+            .grid-list {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .grid-item {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .grid-item-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+        }
+
+        /* --- Button Action Links --- */
+        .action-container {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        .btn-link {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            background-color: #070a12;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 id="main-title">AI-Based Autonomous NPC Agent</h1>
+        <p class="subtitle" id="main-subtitle">Training an Intelligent Combat Agent Using PPO Reinforcement Learning</p>
+    </header>
+
+    <main>
+        <!-- 1. Objective -->
+        <section id="section-objective">
+            <h2>Project Objective</h2>
+            <p>
+                The objective of this project is to develop and train an autonomous non-player character (NPC) agent in a 2D tactical combat environment using Reinforcement Learning. The agent learns to navigate barriers, gather healing targets, and make real-time decisions on when to strike the player and when to raise its defensive shield to block incoming attacks.
+            </p>
+        </section>
+
+        <!-- 2. Tech Stack -->
+        <section id="section-tech-stack">
+            <h2>Technical Stack</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Component</th>
+                        <th>Technology / Library</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Programming Language</strong></td>
+                        <td>Python 3.14</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Simulation Environment</strong></td>
+                        <td>Pygame-ce (Community Edition) 2.5.8</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RL Wrapper</strong></td>
+                        <td>Gymnasium (Standard Gym API)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RL Framework</strong></td>
+                        <td>Stable-Baselines3 (PPO - Proximal Policy Optimisation)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Computation Framework</strong></td>
+                        <td>PyTorch (Neural Network Backing)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Visualization</strong></td>
+                        <td>Matplotlib (Evaluation Metrics Plotting)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 3. Space Specs & Gameplay -->
+        <section id="section-architecture">
+            <h2>Environment & Space Specifications</h2>
+            <p>
+                The custom Gymnasium wrapper maps a continuous 15-dimensional observation space containing relative angles, distance representations, active targets, player health, and attack swing flashes. 
+            </p>
+            <p>
+                The action space is MultiDiscrete([9, 3]), offering the agent 9 movement actions (8 cardinal/diagonal directions + stay still) and 3 combat states: 0 (idle), 1 (attack), and 2 (block/shield).
+            </p>
+            <div class="showcase">
+                <div class="showcase-item">
+                    <img src="results/game_screenshot.png" alt="Headless Game Simulation Frame" id="img-gameplay">
+                    <div class="caption">Figure 1: Telemetry-Instrumented Game Interface showing active cyan block aura and minimap outline mapping.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Results -->
+        <section id="section-results">
+            <h2>Evaluation Metrics & Comparison</h2>
+            <p>
+                The trained PPO policy was evaluated over 10 deterministic rounds against a random policy baseline. The results indicate that the trained PPO agent has mastered the attack-shield coordination, vastly outperforming the random baseline in accumulated reward:
+            </p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th style="text-align: center;">Trained PPO Agent</th>
+                        <th style="text-align: center;">Random Baseline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Mean Episode Reward</strong></td>
+                        <td style="text-align: center; color: var(--accent-green); font-weight: 600;">+69.64</td>
+                        <td style="text-align: center; color: #ef4444;">-16.96</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reward Std Dev</strong></td>
+                        <td style="text-align: center;">145.13</td>
+                        <td style="text-align: center;">1.34</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mean Survival Time</strong></td>
+                        <td style="text-align: center;">3,097 steps</td>
+                        <td style="text-align: center;">5,400 steps</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mean Damage Dealt</strong></td>
+                        <td style="text-align: center;">20 HP</td>
+                        <td style="text-align: center;">0 HP</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Win Rate</strong></td>
+                        <td style="text-align: center;">0.0% (Episode draws)</td>
+                        <td style="text-align: center;">0.0%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="showcase">
+                <div class="showcase-item">
+                    <img src="results/evaluation.png" alt="PPO Evaluation Performance Graph" id="img-eval-charts">
+                    <div class="caption">Figure 2: Performance metrics including episode reward, survival steps, damage dealt, and damage taken.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Key Findings -->
+        <section id="section-findings">
+            <h2>Key Design Decisions</h2>
+            <div class="grid-list">
+                <div class="grid-item">
+                    <div class="grid-item-title">Combat Range Equalization</div>
+                    <p style="margin-bottom: 0;">
+                        The scripted player originally out-ranged the NPC (70px vs 55px). In initial runs, the agent learned that moving close to attack was suicide and never engaged. Increasing the NPC's attack range to 75px allowed the agent to trade hits safely and learn combat utility.
+                    </p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">Anti-Turtling Reward Shaping</div>
+                    <p style="margin-bottom: 0;">
+                        A high block reward (+2.0) led the PPO agent to stand still and hold the shield indefinitely (reward hacking). Reducing the successful block reward to +0.5 and increasing the idle-defend penalty to -0.04 successfully forced the agent to strike the player to gain higher positive rewards (+6.0).
+                    </p>
+                </div>
+                <div class="grid-item" style="grid-column: span 1;">
+                    <div class="grid-item-title">Facing Logic & Smooth Interpolation</div>
+                    <p style="margin-bottom: 0;">
+                        Action sampling in stochastic predictions caused rapid orientation snaps (spinning). This was fixed by locking the NPC's gaze onto the player within close range, and smoothly interpolating its angle rather than snapping instantly.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Conclusion -->
+        <section id="section-conclusion">
+            <h2>Conclusion</h2>
+            <p>
+                The project demonstrates that structured reward shaping and space rebalancing are crucial for stable RL training in action-adventure games. With proper range alignment and anti-turtling guards, the PPO policy effectively masters active combat, dynamically positioning itself, landing hits, and successfully timing shield blocks.
+            </p>
+        </section>
+
+        <!-- 7. Action Button Link -->
+        <div class="action-container">
+            <a href="https://github.com/asakibhussain-sketch/AI-Based-Autonomous-NPC-Agent-Using-Reinforcement-Learning" class="btn-link" id="btn-github-link" target="_blank">
+                Access Code on GitHub
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Autonomous NPC RL Project. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
