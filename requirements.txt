@@ -1,0 +1,8 @@
+﻿# Phase 1+2 (environment + rule-based NPC)
+pygame-ce>=2.5.0          # drop-in pygame replacement; supports Python 3.13+
+
+# Phase 3 (Gymnasium + PPO RL)
+gymnasium>=0.29.0
+stable-baselines3[extra]>=2.1.0   # [extra] includes tensorboard, tqdm, rich
+torch>=2.0.0              # PyTorch -- install via pytorch.org if GPU needed
+numpy>=1.24.0
